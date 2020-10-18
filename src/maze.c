@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 #include <memory.h>
 
 void generate_maze(int** maze, int cx, int cy);
@@ -52,7 +51,6 @@ static dir_t* rand_directions() {
     if (NULL == rnd) end_program("cannot create random directions");
     memcpy(rnd, DIRECTIONS, sizeof(dir_t) * N_DIRECTIONS);
 
-    srand(time(NULL));
     int i;
     for (i = 0; i < N_DIRECTIONS - 1; i++) {
         int j = i + rand() / (RAND_MAX / (N_DIRECTIONS - i) + 1);
@@ -109,31 +107,26 @@ void delete_maze(int** maze, int x) {
 }
 
 void write_maze(int** maze, int x, int y) {
-    FILE* maze_file = fopen("maze.txt", "w");
-    if (NULL == maze_file) end_program("unable to open maze output file");
+    /* opening maze output file */
+    FILE* mazeout = fopen("maze.txt", "w+");
+    if (mazeout == NULL) end_program("unable to create maze output file");
 
+    /* maze printing */
     int i, j;
     for (i = 0; i < y; i++) {
         /* drawing northern edge */
-        for (j = 0; j < x; j++) {
-            char* maze_edge = (maze[j][i] & 1) == 0 ? "+---" : "+   ";
-            fprintf(maze_file, "%s", maze_edge);
-        }
-        fprintf(maze_file, "\n");
-
+        for (j = 0; j < x; j++)
+            fprintf(mazeout, "%s", (maze[j][i] & 1) == 0 ? "+---" : "+   ");
+        fprintf(mazeout, "\n");
         /* drawing western edge */
-        for (j = 0; j < x; j++) {
-            char* maze_edge = (maze[j][i] & 8) == 0 ? "|   " : "    ";
-            fprintf(maze_file, "%s", maze_edge);
-        }
-        fprintf(maze_file, "\n");
+        for (j = 0; j < x; j++)
+            fprintf(mazeout, "%s", (maze[j][i] & 8) == 0 ? "|   " : "    ");
+        fprintf(mazeout, "\n");
     }
     /* drawing southern edge */
     for (j = 0; j < x; j++)
-        fprintf(maze_file, "%s", "+---");
-    fprintf(maze_file, "\n");
-
-    fclose(maze_file);
+        fprintf(mazeout, "%s", "+---");
+    fprintf(mazeout, "%s\n", "+");
 }
 
 int between(int v, int upper) {
