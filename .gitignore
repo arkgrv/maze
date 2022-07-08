@@ -1,3 +1,8 @@
 .vscode/
 *.txt
 maze
+
+
+# Added by cargo
+
+/target
